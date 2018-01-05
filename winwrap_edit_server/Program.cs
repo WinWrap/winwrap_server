@@ -10,30 +10,110 @@ namespace winwrap_edit_server
 {
     public class Program
     {
-        //public static WWB.SharedWWB sharedWWB = new WWB.SharedWWB();
-        public static WWB.WinWrapBasicService WinWrapBasicService = new WWB.WinWrapBasicService();
-
         static void Main(string[] args)
         {
-            Console.WriteLine("winwrap_edit_server");
+            Dictionary<string, object> parameters = GetParameters(args);
+
+            if ((bool)parameters["help"])
+            {
+                Console.Write(Util.ReadResourceTextFile("Help"));
+                return;
+            }
+
+            Console.WriteLine(Util.ReadResourceTextFile("Startup", parameters));
+
+            if ((bool)parameters["log"])
+                WWB.WinWrapBasicService.Singleton.LogFile =
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                    Util.Replace("\\WinWrapBasicService-{port}.txt", parameters);
 
             var host = new WebHostBuilder()
-    .UseKestrel()
-    .ConfigureLogging((hostingContext, logging) =>
-    {
-        logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-        logging.AddConsole();
-        logging.AddDebug();
-        // comment the next line out to get full logging
-        logging.SetMinimumLevel(LogLevel.Critical);
-    })
-    .UseStartup<Startup>()
-    //.UseUrls("http://localhost:5000") // xyz 
-    //.UseUrls("http://192.168.1.208:5000")
-    .UseUrls("http://192.168.1.211:5000")
-    .Build();
+                .UseKestrel()
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    // comment the next line out to get full logging
+                    logging.SetMinimumLevel(LogLevel.Critical);
+                })
+                .UseStartup<Startup>()
+                .UseUrls(Util.Replace("http://{ip}:{port}", parameters))
+                .Build();
+
+            if ((string)parameters["start"] != "")
+                System.Diagnostics.Process.Start(Util.Replace("{start}?serverip={ip}:{port}", parameters));
 
             host.Run();
+        }
+
+        static private Dictionary<string, object> GetParameters(string[] args)
+        {
+            // get the options from the command line
+            Dictionary<string, object> default_parameters = new Dictionary<string, object>()
+            {
+                { "help", false },
+                { "log", false },
+                { "ip", "localhost" },
+                { "port", 5000 },
+                { "start", "http://www.winwrap.com/webedit/index.html" }
+            };
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            foreach (string arg in args)
+            {
+                string[] parts = arg.Split(new char[] { '=' }, 2);
+                string key = parts[0];
+                if (!default_parameters.ContainsKey(key))
+                {
+                    Console.Write(Util.ReadResourceTextFile("BadOption", key));
+                    parameters["help"] = true;
+                    continue;
+                }
+
+                object value = default_parameters[key];
+                if (parts.Length == 1)
+                {
+                    if (default_parameters[key].GetType() != typeof(Boolean))
+                    {
+                        Console.Write(Util.ReadResourceTextFile("BadOptionNoValue", key));
+                        parameters["help"] = true;
+                        continue;
+                    }
+
+                    value = true;
+                }
+                else
+                {
+                    if (default_parameters[key].GetType() == typeof(Boolean))
+                    {
+                        Console.Write(Util.ReadResourceTextFile("BadOptionValue", key));
+                        parameters["help"] = true;
+                        continue;
+                    }
+
+                    value = parts[1];
+                    try
+                    {
+                        value = Convert.ChangeType(parts[1], value.GetType());
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write(Util.ReadResourceTextFile("BadOptionValue2", key, ex.Message));
+                        parameters["help"] = true;
+                        continue;
+                    }
+                }
+
+                parameters[key] = value;
+            }
+
+            // establish values from defaults for missing parameters
+            foreach (string key in default_parameters.Keys)
+                if (!parameters.ContainsKey(key))
+                    parameters[key] = default_parameters[key];
+
+            return parameters;
         }
     }
 

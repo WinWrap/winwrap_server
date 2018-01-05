@@ -30,11 +30,6 @@ namespace winwrap_edit_server
             });
 
             app.UseMvc();
-
-            app.Run(context =>
-            {
-                return context.Response.WriteAsync("Hello World from the winwrap_edit_server, open winwrap_edit_client in Edge brwoser");
-            });
         }
     }
 }

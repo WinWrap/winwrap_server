@@ -23,25 +23,7 @@ namespace winwrap_edit_server.Controllers
         [Route("pulllog")]
         public IActionResult PullLog()
         {
-            string result = Program.WinWrapBasicService.PullLog();
-            return Ok(result);
-        }
-
-        //[HttpPost("version")]
-        [Route("version")]
-        public IActionResult Version()
-        {
-            Dictionary<string, object> request = new Dictionary<string, object>()
-            {
-                { "command", "?attach" },
-                { "version", "10.40.001" },
-                { "unique_name", -1 },
-                { "id", 0 },
-                { "gen", 1 }
-            };
-            string jsonrequest = JsonConvert.SerializeObject(request, Formatting.Indented);
-            string result = Program.WinWrapBasicService.Synchronize(jsonrequest, 0);
-            //var obj = JsonConvert.DeserializeObject<List<Dictionary<string, dynamic>>>(result);
+            string result = WWB.WinWrapBasicService.Singleton.PullLog();
             return Ok(result);
         }
 
@@ -49,7 +31,7 @@ namespace winwrap_edit_server.Controllers
         public IActionResult Poll(int id, [FromBody]WinWrapMessage postdata)
         {
             string jsontext = postdata.ToString();
-            string responses = Program.WinWrapBasicService.Synchronize(jsontext, id);
+            string responses = WWB.WinWrapBasicService.Singleton.Synchronize(jsontext, id);
             return Ok(new WinWrapMessage(responses));
         }
     }

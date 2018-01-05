@@ -40,9 +40,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="ww10_net, Version=10.40.0.51, Culture=neutral, PublicKeyToken=d08a0738ecd16506, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Polar Engineering\WinWrap Basic v10 - For .NET 4.0\REDIST\ww10_net.dll</HintPath>
+    <Reference Include="ww10_net">
+      <HintPath>..\..\..\dev\ww10.40\wwbnet\4.0\Support\REDIST\ww10_net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +52,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="WWB\MyFileSystem.cs" />
     <Compile Include="WWB\SharedWWB.cs" />
     <Compile Include="WWB\SynchronizingQueue.cs" />
@@ -71,6 +71,22 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel">
       <Version>2.0.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TextFiles\Help.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TextFiles\BadOption.txt" />
+    <EmbeddedResource Include="TextFiles\Startup.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TextFiles\BadOptionValue.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TextFiles\BadOptionValue2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TextFiles\BadOptionNoValue.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
