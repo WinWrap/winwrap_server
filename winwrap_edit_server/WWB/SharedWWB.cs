@@ -34,6 +34,7 @@ namespace WWB
             EventWaitHandle ready = new EventWaitHandle(false, EventResetMode.AutoReset);
             thread_ = new Thread(() =>
             {
+                Util.IgnoreDialogs = true;
                 using (basic_ = new BasicNoUIObj())
                 {
                     basic_.DoEvents += Basic__DoEvents;

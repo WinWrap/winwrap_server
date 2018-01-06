@@ -11,9 +11,17 @@ using WinWrap.Basic.Classic;
 
 namespace WWB
 {
-    class MyFileSystem : IVirtualFileSystem
+    public class MyFileSystem : IVirtualFileSystem
     {
-        string root_ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WinWrapThread";
+        string root_;
+
+        public MyFileSystem(string subdir = null)
+        {
+            if (subdir == null)
+                subdir = "WinWrapThread";
+
+            root_ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\" + subdir;
+        }
 
         public string Combine(string baseScriptPath, string name)
         {
