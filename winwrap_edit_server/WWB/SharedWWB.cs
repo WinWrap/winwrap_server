@@ -41,7 +41,7 @@ namespace WWB
                     basic_.Secret = new Guid("00000000-0000-0000-0000-000000000000");
                     basic_.Initialize();
                     basic_.Sandboxed = true;
-                    basic_.BlockedKeywords = "Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
+                    basic_.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                     basic_.VirtualFileSystem = filesystem_;
                     basic_.SynchronizedEdit = true;
 
