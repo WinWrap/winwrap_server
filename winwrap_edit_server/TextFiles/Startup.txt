@@ -1,5 +1,4 @@
 ﻿winwrap_edit_server help - for options
-IP={ip}
-Port={port}
-Log={log}
-Start={start}
+ip={ip}
+port={port}
+start={start}

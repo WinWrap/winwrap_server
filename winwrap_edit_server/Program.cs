@@ -17,6 +17,7 @@ namespace winwrap_edit_server
             if ((bool)parameters["help"])
             {
                 Console.Write(Util.ReadResourceTextFile("Help"));
+                Console.ReadKey();
                 return;
             }
 
@@ -50,7 +51,7 @@ namespace winwrap_edit_server
         static private Dictionary<string, object> GetParameters(string[] args)
         {
             // get the options from the command line
-            Dictionary<string, object> default_parameters = new Dictionary<string, object>()
+            Dictionary<string, object> default_parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "help", false },
                 { "log", false },

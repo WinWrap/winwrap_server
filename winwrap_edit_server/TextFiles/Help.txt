@@ -7,3 +7,5 @@ options:
  start=url - open the web browser on url
              (default is http://www.winwrap.com/webedit/index.html)
              use start= (no url) to prevent the web browser from opening a page
+
+Press any key to exit...
