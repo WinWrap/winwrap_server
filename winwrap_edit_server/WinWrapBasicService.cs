@@ -57,7 +57,14 @@ namespace winwrap_edit_server
                 }
             }
 
-            sharedWWB_ = new WWB.SharedWWB(filesystem_, log_file_ != null);
+            sharedWWB_ = new WWB.SharedWWB((basic) =>
+            {
+                // configure basic
+                basic.Sandboxed = true;
+                basic.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
+                basic.VirtualFileSystem = filesystem_;
+                return true; // synchronized editing
+            }, log_file_ != null);
         }
 
         public string LogFile

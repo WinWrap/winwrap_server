@@ -26,7 +26,7 @@ namespace WWB
         SynchronizingQueues response_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
 
-        public SharedWWB(WinWrap.Basic.IVirtualFileSystem filesystem, bool logging = false)
+        public SharedWWB(Func<BasicNoUIObj, bool> configure = null, bool logging = false)
         {
             Logging = logging;
 
@@ -40,11 +40,13 @@ namespace WWB
                     basic_.Synchronizing += Basic__Synchronizing;
                     basic_.Secret = new Guid("00000000-0000-0000-0000-000000000000");
                     basic_.Initialize();
-                    // 
-                    basic_.Sandboxed = true;
-                    basic_.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
-                    basic_.VirtualFileSystem = filesystem;
-                    basic_.SynchronizedEdit = true;
+                    // configure basic
+                    bool edit = configure?.Invoke(basic_) ?? false;
+                    // start synchronizing
+                    if (edit)
+                        basic_.SynchronizedEdit = true;
+                    else
+                        basic_.Synchronized = true;
 
                     ready.Set();
                     while (!kill_)
