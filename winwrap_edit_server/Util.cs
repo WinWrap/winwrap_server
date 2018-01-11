@@ -10,11 +10,30 @@ namespace winwrap_edit_server
 {
     public static class Util
     {
-        public static string ReadResourceTextFile(string name)
+        public static ICollection<string> GetResourceFileNames(string prefix)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             string path = assembly.GetName().Name.ToString();
-            using (Stream stream = assembly.GetManifestResourceStream($"{path}.TextFiles.{name}.txt"))
+            prefix = path + ".ResFiles." + prefix;
+            if (!prefix.EndsWith("."))
+                prefix += ".";
+
+            List<string> names = new List<string>();
+            foreach (string name in assembly.GetManifestResourceNames())
+                if (name.StartsWith(prefix))
+                    names.Add(name.Substring(prefix.Length));
+
+            return names;
+        }
+
+        public static string ReadResourceTextFile(string name, bool textext = true)
+        {
+            if (textext)
+                name += ".txt";
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string path = assembly.GetName().Name.ToString();
+            using (Stream stream = assembly.GetManifestResourceStream($"{path}.ResFiles.{name}"))
             using (StreamReader stream_reader = new StreamReader(stream))
                 return stream_reader.ReadToEnd();
         }

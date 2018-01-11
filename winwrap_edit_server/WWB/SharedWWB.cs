@@ -23,11 +23,10 @@ namespace WWB
         EventWaitHandle dead_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         EventWaitHandle basic_synchronize_done_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         static object lock_ = new object();
-        MyFileSystem filesystem_ = new MyFileSystem();
         SynchronizingQueues response_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
 
-        public SharedWWB(bool logging = false)
+        public SharedWWB(WinWrap.Basic.IVirtualFileSystem filesystem, bool logging = false)
         {
             Logging = logging;
 
@@ -41,9 +40,10 @@ namespace WWB
                     basic_.Synchronizing += Basic__Synchronizing;
                     basic_.Secret = new Guid("00000000-0000-0000-0000-000000000000");
                     basic_.Initialize();
+                    // 
                     basic_.Sandboxed = true;
                     basic_.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
-                    basic_.VirtualFileSystem = filesystem_;
+                    basic_.VirtualFileSystem = filesystem;
                     basic_.SynchronizedEdit = true;
 
                     ready.Set();

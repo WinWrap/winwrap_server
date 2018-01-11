@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,20 +17,25 @@ namespace winwrap_edit_server
 
             if ((bool)parameters["help"])
             {
-                Console.Write(Util.ReadResourceTextFile("Help"));
+                Console.Write(Util.ReadResourceTextFile("Messages.Help"));
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine(Util.ReadResourceTextFile("Startup", parameters));
+            Console.WriteLine(Util.ReadResourceTextFile("Messages.Startup", parameters));
 
+            string wwwroot = (string)parameters["wwwroot"];
+
+            string log_file = null;
             if ((bool)parameters["log"])
-                WWB.WinWrapBasicService.Singleton.LogFile =
+                log_file =
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                    Util.Replace("\\WinWrapBasicService-{port}.txt", parameters);
+                    Util.Replace("\\WebEditServer-{port}.txt", parameters);
 
             var host = new WebHostBuilder()
                 .UseKestrel()
+                .UseContentRoot(wwwroot)
+                .UseWebRoot(wwwroot)
                 .ConfigureLogging((hostingContext, logging) =>
                 {
                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
@@ -43,7 +49,15 @@ namespace winwrap_edit_server
                 .Build();
 
             if ((string)parameters["start"] != "")
-                System.Diagnostics.Process.Start(Util.Replace("{start}?serverip={ip}:{port}", parameters));
+            {
+                string prefix = null;
+                if (!((string)parameters["start"]).StartsWith("http:"))
+                    prefix = Util.Replace("http://{ip}:{port}/", parameters);
+
+                System.Diagnostics.Process.Start(prefix + Util.Replace("{start}?serverip={ip}:{port}", parameters));
+            }
+
+            WinWrapBasicService.Singleton.Initialize((bool)parameters["reset"], log_file);
 
             host.Run();
         }
@@ -57,7 +71,9 @@ namespace winwrap_edit_server
                 { "log", false },
                 { "ip", "localhost" },
                 { "port", 5000 },
-                { "start", "http://www.winwrap.com/webedit/index.html" }
+                { "reset", false },
+                { "start", "http://www.winwrap.com/webedit/index.html" },
+                { "wwwroot", Directory.GetCurrentDirectory() }
             };
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -67,7 +83,7 @@ namespace winwrap_edit_server
                 string key = parts[0];
                 if (!default_parameters.ContainsKey(key))
                 {
-                    Console.Write(Util.ReadResourceTextFile("BadOption", key));
+                    Console.Write(Util.ReadResourceTextFile("Messages.BadOption", key));
                     parameters["help"] = true;
                     continue;
                 }
@@ -77,7 +93,7 @@ namespace winwrap_edit_server
                 {
                     if (default_parameters[key].GetType() != typeof(Boolean))
                     {
-                        Console.Write(Util.ReadResourceTextFile("BadOptionNoValue", key));
+                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionNoValue", key));
                         parameters["help"] = true;
                         continue;
                     }
@@ -88,7 +104,7 @@ namespace winwrap_edit_server
                 {
                     if (default_parameters[key].GetType() == typeof(Boolean))
                     {
-                        Console.Write(Util.ReadResourceTextFile("BadOptionValue", key));
+                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionValue", key));
                         parameters["help"] = true;
                         continue;
                     }
@@ -100,7 +116,7 @@ namespace winwrap_edit_server
                     }
                     catch (Exception ex)
                     {
-                        Console.Write(Util.ReadResourceTextFile("BadOptionValue2", key, ex.Message));
+                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionValue2", key, ex.Message));
                         parameters["help"] = true;
                         continue;
                     }

@@ -30,6 +30,13 @@ namespace winwrap_edit_server
             });
 
             app.UseMvc();
+
+            // based on sample code from https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files
+            DefaultFilesOptions options = new DefaultFilesOptions();
+            options.DefaultFileNames.Clear();
+            options.DefaultFileNames.Add("index.html");
+            app.UseDefaultFiles(options);
+            app.UseStaticFiles();
         }
     }
 }

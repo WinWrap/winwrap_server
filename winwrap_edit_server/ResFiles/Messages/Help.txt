@@ -3,9 +3,11 @@ options:
  help - show this help
  ip=addr - run the server as this address (default is localhost)
  port=num - listen for http requests on this port (default is 5000)
- log - messages will be logged to My Documents\WinWrapBasicService-{port}.txt
+ log - messages will be logged to My Documents\WebEditServer-{port}.txt
+ reset - overwrite samples scripts with the initial contents
  start=url - open the web browser on url
              (default is http://www.winwrap.com/webedit/index.html)
              use start= (no url) to prevent the web browser from opening a page
+ wwwroot=dir - get web pages from this directory (default is {wwwroot})
 
 Press any key to exit...

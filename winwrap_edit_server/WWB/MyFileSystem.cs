@@ -13,7 +13,7 @@ namespace WWB
 {
     public class MyFileSystem : IVirtualFileSystem
     {
-        string root_;
+        private string root_;
 
         public MyFileSystem(string subdir = null)
         {

@@ -56,7 +56,7 @@
     <Compile Include="WWB\MyFileSystem.cs" />
     <Compile Include="WWB\SharedWWB.cs" />
     <Compile Include="WWB\SynchronizingQueue.cs" />
-    <Compile Include="WWB\WinWrapBasicService.cs" />
+    <Compile Include="WinWrapBasicService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -71,22 +71,31 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel">
       <Version>2.0.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles">
+      <Version>2.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Net.Http.Formatting.Extension">
+      <Version>5.2.3</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TextFiles\Help.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\Help.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TextFiles\BadOption.txt" />
-    <EmbeddedResource Include="TextFiles\Startup.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\BadOption.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\Startup.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TextFiles\BadOptionValue.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\BadOptionValue.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TextFiles\BadOptionValue2.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\BadOptionValue2.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TextFiles\BadOptionNoValue.txt" />
+    <EmbeddedResource Include="ResFiles\Messages\BadOptionNoValue.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ResFiles\Samples\Sample1.bas" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

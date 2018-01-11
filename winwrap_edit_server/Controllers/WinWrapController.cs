@@ -23,7 +23,7 @@ namespace winwrap_edit_server.Controllers
         [Route("pulllog")]
         public IActionResult PullLog()
         {
-            string result = WWB.WinWrapBasicService.Singleton.PullLog();
+            string result = WinWrapBasicService.Singleton.PullLog();
             return Ok(result);
         }
 
@@ -31,7 +31,7 @@ namespace winwrap_edit_server.Controllers
         public IActionResult Poll(int id, [FromBody]WinWrapMessage postdata)
         {
             string jsontext = postdata.ToString();
-            string responses = WWB.WinWrapBasicService.Singleton.Synchronize(jsontext, id);
+            string responses = WinWrapBasicService.Singleton.Synchronize(jsontext, id);
             return Ok(new WinWrapMessage(responses));
         }
     }
