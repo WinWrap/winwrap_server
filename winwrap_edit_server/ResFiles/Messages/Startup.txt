@@ -1,5 +1,7 @@
 ﻿winwrap_edit_server help - for options
+{flags}
 ip={ip}
 port={port}
+scriptroot={scriptroot}
 start={start}
 wwwroot={wwwroot}

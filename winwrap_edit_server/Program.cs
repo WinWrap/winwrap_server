@@ -22,8 +22,17 @@ namespace winwrap_edit_server
                 return;
             }
 
+            string flags = "";
+            if ((bool)parameters["log"]) flags += "\r\nlog";
+            if ((bool)parameters["reset"]) flags += "\r\nreset";
+            if ((bool)parameters["sandboxed"]) flags += "\r\nsandboxed";
+            parameters["flags"] = flags;
+
             Console.WriteLine(Util.ReadResourceTextFile("Messages.Startup", parameters));
 
+            bool reset = (bool)parameters["reset"];
+            bool sandboxed = (bool)parameters["sandboxed"];
+            string scriptroot = (string)parameters["scriptroot"];
             string wwwroot = (string)parameters["wwwroot"];
 
             string log_file = null;
@@ -57,7 +66,7 @@ namespace winwrap_edit_server
                 System.Diagnostics.Process.Start(prefix + Util.Replace("{start}?serverip={ip}:{port}", parameters));
             }
 
-            WinWrapBasicService.Singleton.Initialize((bool)parameters["reset"], log_file);
+            WinWrapBasicService.Singleton.Initialize(sandboxed, scriptroot, reset, log_file);
 
             host.Run();
         }
@@ -72,6 +81,8 @@ namespace winwrap_edit_server
                 { "ip", "localhost" },
                 { "port", 5000 },
                 { "reset", false },
+                { "sandboxed", false },
+                { "scriptroot", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WebEditServer" },
                 { "start", "http://www.winwrap.com/webedit/index.html" },
                 { "wwwroot", Directory.GetCurrentDirectory() }
             };

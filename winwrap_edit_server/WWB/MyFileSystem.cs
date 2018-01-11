@@ -15,12 +15,12 @@ namespace WWB
     {
         private string root_;
 
-        public MyFileSystem(string subdir = null)
+        public MyFileSystem(string root)
         {
-            if (subdir == null)
-                subdir = "WinWrapThread";
+            if (root.EndsWith("\\"))
+                root = root.Substring(0, root.Length - 1);
 
-            root_ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\" + subdir;
+            root_ = root;
         }
 
         public string Combine(string baseScriptPath, string name)

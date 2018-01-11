@@ -32,13 +32,13 @@ namespace winwrap_edit_server
         {
         }
 
-        public void Initialize(bool reset, string log_file)
+        public void Initialize(bool sandboxed, string scriptroot, bool reset, string log_file)
         {
             log_file_ = log_file;
             if (log_file_ != null)
                 File.WriteAllText(log_file_, "");
 
-            filesystem_ = new WWB.MyFileSystem("WebEditServer");
+            filesystem_ = new WWB.MyFileSystem(scriptroot);
             string root = filesystem_.Combine(null, null);
             if (!Directory.Exists(root))
             {
@@ -60,7 +60,7 @@ namespace winwrap_edit_server
             sharedWWB_ = new WWB.SharedWWB((basic) =>
             {
                 // configure basic
-                basic.Sandboxed = true;
+                basic.Sandboxed = sandboxed;
                 basic.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                 basic.VirtualFileSystem = filesystem_;
                 return true; // synchronized editing

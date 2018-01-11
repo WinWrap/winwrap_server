@@ -5,6 +5,9 @@ options:
  port=num - listen for http requests on this port (default is 5000)
  log - messages will be logged to My Documents\WebEditServer-{port}.txt
  reset - overwrite samples scripts with the initial contents
+ sandboxed - prevent full access to WWB-COM and WWB.NET
+ scriptroot=dir - all scripts live in this directory tree
+                  (default user's Documents\WebEditServer)
  start=url - open the web browser on url
              (default is http://www.winwrap.com/webedit/index.html)
              use start= (no url) to prevent the web browser from opening a page
