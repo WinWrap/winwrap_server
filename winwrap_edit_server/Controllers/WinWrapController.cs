@@ -20,6 +20,22 @@ namespace winwrap_edit_server.Controllers
             return Ok("Hello World from the WinWrap controller");
         }
 
+        [Route("version")]
+        public IActionResult Version()
+        {
+            Dictionary<string, object> request = new Dictionary<string, object>()
+            {
+                { "command", "?attach" },
+                { "version", "10.40.001" },
+                { "unique_name", -1 },
+                { "id", 0 },
+                { "gen", 1 }
+            };
+            string jsontext = JsonConvert.SerializeObject(request, Formatting.Indented);
+            string responses = WinWrapBasicService.Singleton.Synchronize(jsontext, 0);
+            return Ok(responses);
+        }
+
         [Route("pulllog")]
         public IActionResult PullLog()
         {
