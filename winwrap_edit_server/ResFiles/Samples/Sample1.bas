@@ -1,4 +1,6 @@
-﻿Imports System
+﻿'#Language "WWB.NET"
+
+Imports System
 Imports System.Collections.Generic
 
 Class Person
