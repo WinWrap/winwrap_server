@@ -32,7 +32,16 @@ namespace winwrap_edit_server
         {
         }
 
-        public void Initialize(bool sandboxed, string scriptroot, bool reset, string log_file)
+        public static void Shutdown()
+        {
+            if (singleton_ != null)
+            {
+                singleton_.sharedWWB_.Kill();
+                singleton_ = null;
+            }
+        }
+
+        public void Initialize(bool debug, bool sandboxed, string scriptroot, bool reset, string log_file)
         {
             log_file_ = log_file;
             if (log_file_ != null)
@@ -60,6 +69,7 @@ namespace winwrap_edit_server
             sharedWWB_ = new WWB.SharedWWB((basic) =>
             {
                 // configure basic
+                basic.EditOnly = !debug;
                 basic.Sandboxed = sandboxed;
                 basic.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                 basic.VirtualFileSystem = filesystem_;

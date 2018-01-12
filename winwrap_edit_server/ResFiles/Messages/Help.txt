@@ -3,6 +3,7 @@ options:
  help - show this help
  ip=addr - run the server as this address (default is localhost)
  port=num - listen for http requests on this port (default is 5000)
+ debug - allow debugging
  log - messages will be logged to My Documents\WebEditServer-{port}.txt
  reset - overwrite samples scripts with the initial contents
  sandboxed - prevent full access to WWB-COM and WWB.NET
@@ -11,6 +12,6 @@ options:
  start=url - open the web browser on url
              (default is http://www.winwrap.com/webedit/index.html)
              use start= (no url) to prevent the web browser from opening a page
- wwwroot=dir - get web pages from this directory (default is {wwwroot})
+ wwwroot=dir - get web pages from this directory (default is null)
 
 Press any key to exit...

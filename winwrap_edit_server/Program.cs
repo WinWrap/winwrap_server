@@ -23,6 +23,7 @@ namespace winwrap_edit_server
             }
 
             string flags = "";
+            if ((bool)parameters["debug"]) flags += "\r\ndebug";
             if ((bool)parameters["log"]) flags += "\r\nlog";
             if ((bool)parameters["reset"]) flags += "\r\nreset";
             if ((bool)parameters["sandboxed"]) flags += "\r\nsandboxed";
@@ -30,6 +31,7 @@ namespace winwrap_edit_server
 
             Console.WriteLine(Util.ReadResourceTextFile("Messages.Startup", parameters));
 
+            bool debug = (bool)parameters["debug"];
             bool reset = (bool)parameters["reset"];
             bool sandboxed = (bool)parameters["sandboxed"];
             string scriptroot = (string)parameters["scriptroot"];
@@ -41,11 +43,14 @@ namespace winwrap_edit_server
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                     Util.Replace("\\WebEditServer-{port}.txt", parameters);
 
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(wwwroot)
-                .UseWebRoot(wwwroot)
-                .ConfigureLogging((hostingContext, logging) =>
+            var hostBuilder = new WebHostBuilder()
+                .UseKestrel();
+
+            if (!string.IsNullOrEmpty(wwwroot))
+                hostBuilder.UseContentRoot(wwwroot)
+                    .UseWebRoot(wwwroot);
+
+            var host = hostBuilder.ConfigureLogging((hostingContext, logging) =>
                 {
                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                     logging.AddConsole();
@@ -66,9 +71,11 @@ namespace winwrap_edit_server
                 System.Diagnostics.Process.Start(prefix + Util.Replace("{start}?serverip={ip}:{port}", parameters));
             }
 
-            WinWrapBasicService.Singleton.Initialize(sandboxed, scriptroot, reset, log_file);
+            WinWrapBasicService.Singleton.Initialize(debug, sandboxed, scriptroot, reset, log_file);
 
             host.Run();
+
+            WinWrapBasicService.Shutdown();
         }
 
         static private Dictionary<string, object> GetParameters(string[] args)
@@ -77,6 +84,7 @@ namespace winwrap_edit_server
             Dictionary<string, object> default_parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "help", false },
+                { "debug", false },
                 { "log", false },
                 { "ip", "localhost" },
                 { "port", 5000 },
@@ -84,7 +92,7 @@ namespace winwrap_edit_server
                 { "sandboxed", false },
                 { "scriptroot", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WebEditServer" },
                 { "start", "http://www.winwrap.com/webedit/index.html" },
-                { "wwwroot", Directory.GetCurrentDirectory() }
+                { "wwwroot", "" }
             };
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
