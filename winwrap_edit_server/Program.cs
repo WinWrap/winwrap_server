@@ -14,10 +14,23 @@ namespace winwrap_edit_server
         static void Main(string[] args)
         {
             Dictionary<string, object> parameters = GetParameters(args);
+            parameters["appname"] = "winwrap_edit_server";
 
-            if ((bool)parameters["help"])
+            bool help = (bool)parameters["help"];
+            string error = VerifyWinWrapBasic();
+            if (error != null)
+                help = true;
+
+            if (help)
             {
-                Console.Write(Util.ReadResourceTextFile("Messages.Help"));
+                if (error == null)
+                    error = "";
+                else
+                    error = "\r\n" + error;
+
+                parameters["error"] = error;
+
+                Console.Write(Util.ReadResourceTextFile("Messages.Help", parameters));
                 Console.ReadKey();
                 return;
             }
@@ -78,6 +91,26 @@ namespace winwrap_edit_server
             WinWrapBasicService.Shutdown();
         }
 
+        static private string VerifyWinWrapBasic(Guid secret = default(Guid))
+        {
+            try
+            {
+                using (WinWrap.Basic.BasicNoUIObj basic = new WinWrap.Basic.BasicNoUIObj())
+                {
+                    basic.Secret = secret;
+                    basic.Initialize();
+                    if (basic.IsInitialized())
+                        return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+            return null;
+        }
+
         static private Dictionary<string, object> GetParameters(string[] args)
         {
             // get the options from the command line
@@ -108,9 +141,10 @@ namespace winwrap_edit_server
                 }
 
                 object value = default_parameters[key];
+                Type value_type = value.GetType();
                 if (parts.Length == 1)
                 {
-                    if (default_parameters[key].GetType() != typeof(Boolean))
+                    if (value_type != typeof(Boolean))
                     {
                         Console.Write(Util.ReadResourceTextFile("Messages.BadOptionNoValue", key));
                         parameters["help"] = true;
@@ -121,7 +155,7 @@ namespace winwrap_edit_server
                 }
                 else
                 {
-                    if (default_parameters[key].GetType() == typeof(Boolean))
+                    if (value_type == typeof(Boolean))
                     {
                         Console.Write(Util.ReadResourceTextFile("Messages.BadOptionValue", key));
                         parameters["help"] = true;
@@ -131,7 +165,7 @@ namespace winwrap_edit_server
                     value = parts[1];
                     try
                     {
-                        value = Convert.ChangeType(parts[1], value.GetType());
+                        value = Convert.ChangeType(parts[1], value_type);
                     }
                     catch (Exception ex)
                     {

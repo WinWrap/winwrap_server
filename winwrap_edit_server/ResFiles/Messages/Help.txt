@@ -1,17 +1,21 @@
-﻿winwrap_edit_server [options]
+﻿{appname} [options]
+
+Uses the new remote edit capability provided by WinWrap Basic v10.40.
+
 options:
  help - show this help
- ip=addr - run the server as this address (default is localhost)
- port=num - listen for http requests on this port (default is 5000)
- debug - allow debugging
- log - messages will be logged to My Documents\WebEditServer-{port}.txt
+ ip=addr - run the server as this address (default is {ip})
+ port=num - listen for http requests on this port (default is {port})
+ debug - allow debugging (default is edit only)
+ log - messages will be logged to Documents\{appname}-{port}.txt
  reset - overwrite samples scripts with the initial contents
  sandboxed - prevent full access to WWB-COM and WWB.NET
  scriptroot=dir - all scripts live in this directory tree
-                  (default user's Documents\WebEditServer)
+                  (default is {scriptroot})
  start=url - open the web browser on url
-             (default is http://www.winwrap.com/webedit/index.html)
+             (default is {start})
              use start= (no url) to prevent the web browser from opening a page
- wwwroot=dir - get web pages from this directory (default is null)
-
+ wwwroot=dir - get web pages from this directory
+               (default is {wwwroot})
+{error}
 Press any key to exit...

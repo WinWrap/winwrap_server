@@ -1,4 +1,6 @@
-﻿winwrap_edit_server help - for options
+﻿{appname} help - for options
+
+Uses the new remote edit capability provided by WinWrap Basic v10.40.
 {flags}
 ip={ip}
 port={port}
