@@ -66,9 +66,11 @@ namespace winwrap_edit_server
                 }
             }
 
-            sharedWWB_ = new WWB.SharedWWB((basic) =>
+            sharedWWB_ = new WWB.SharedWWB(basic =>
             {
                 // configure basic
+                basic.Secret = new Guid("00000000-0000-0000-0000-000000000000");
+                basic.Initialize();
                 basic.EditOnly = !debug;
                 basic.Sandboxed = sandboxed;
                 basic.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";

@@ -27,7 +27,7 @@ namespace WWB
         SynchronizingQueues response_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
 
-        public SharedWWB(Func<BasicNoUIObj, bool> configure = null, bool logging = false)
+        public SharedWWB(Func<BasicNoUIObj, bool> configure, bool logging = false)
         {
             Logging = logging;
 
@@ -39,10 +39,8 @@ namespace WWB
                 {
                     basic_.DoEvents += Basic__DoEvents;
                     basic_.Synchronizing += Basic__Synchronizing;
-                    basic_.Secret = new Guid("00000000-0000-0000-0000-000000000000");
-                    basic_.Initialize();
                     // configure basic
-                    bool edit = configure?.Invoke(basic_) ?? false;
+                    bool edit = configure.Invoke(basic_);
                     // start synchronizing
                     if (edit)
                         basic_.SynchronizedEdit = true;
