@@ -50,7 +50,8 @@ namespace WWB
                     ready.Set();
                     while (!kill_)
                     {
-                        basic_synchronize_ready_.WaitOne(10);
+                        Thread.Sleep(10);
+                        //basic_synchronize_ready_.WaitOne(10);
                         ProcessRequestQueue();
                     }
                 }
