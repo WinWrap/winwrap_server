@@ -21,7 +21,6 @@ namespace WWB
         bool kill_; // kill the thread
         bool killed_;
         EventWaitHandle dead_ = new EventWaitHandle(false, EventResetMode.ManualReset);
-        EventWaitHandle basic_synchronize_ready_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         EventWaitHandle basic_synchronize_done_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         static object lock_ = new object();
         SynchronizingQueues response_sqs_ = new SynchronizingQueues();
@@ -34,7 +33,7 @@ namespace WWB
             EventWaitHandle ready = new EventWaitHandle(false, EventResetMode.AutoReset);
             thread_ = new Thread(() =>
             {
-                Util.IgnoreDialogs = true;
+                WinWrap.Basic.Util.IgnoreDialogs = true;
                 using (basic_ = new BasicNoUIObj())
                 {
                     basic_.DoEvents += Basic__DoEvents;
@@ -51,14 +50,12 @@ namespace WWB
                     while (!kill_)
                     {
                         Thread.Sleep(10);
-                        //basic_synchronize_ready_.WaitOne(10);
                         ProcessRequestQueue();
                     }
                 }
 
                 killed_ = true;
                 dead_.Set();
-                basic_synchronize_ready_.Dispose();
                 basic_synchronize_done_.Dispose();
             });
 
@@ -115,7 +112,7 @@ namespace WWB
             basic_.Synchronize(null, 0);
 
             // do pending windows events
-            Util.DoEvents();
+            WinWrap.Basic.Util.DoEvents();
 
             // all synchronize data has been sent
             basic_synchronize_done_.Set();
@@ -139,9 +136,6 @@ namespace WWB
 
                 // prepare synchronize done event
                 basic_synchronize_done_.Reset();
-
-                // inform worker thread that a new synchronize message is ready
-                basic_synchronize_ready_.Set();
 
                 // ?attach timeout is 0.5 seconds
                 int timeout = attach ? 500 : 50;

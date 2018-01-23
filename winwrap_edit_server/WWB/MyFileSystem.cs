@@ -52,7 +52,7 @@ namespace WWB
 
             name = Path.GetFullPath(name);
             if (!name.StartsWith(root_ + "\\"))
-                throw new Exception("Invalid file path.");
+                throw new Exception($"Invalid file path '{name}'");
 
             // remove root_
             return name.Substring(root_.Length);
@@ -96,7 +96,7 @@ namespace WWB
                 scriptPath = scriptPath.Substring(x + 1);
 
             if (!scriptPath.StartsWith("\\") || scriptPath.Contains(".."))
-                throw new Exception("Invalid file path.");
+                throw new Exception($"Invalid file path '{scriptPath}'.");
 
             return root_ + scriptPath;
         }

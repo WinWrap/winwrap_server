@@ -58,6 +58,7 @@
     <Compile Include="WWB\SharedWWB.cs" />
     <Compile Include="WWB\SynchronizingQueue.cs" />
     <Compile Include="WinWrapBasicService.cs" />
+    <Compile Include="WWB\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

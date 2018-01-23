@@ -1,4 +1,4 @@
-﻿{appname} [options]
+﻿{.appname} [options]
 
 Uses the new remote edit capability provided by WinWrap Basic v10.40.
 
@@ -7,7 +7,7 @@ options:
  ip=addr - run the server as this address (default is {ip})
  port=num - listen for http requests on this port (default is {port})
  debug - allow debugging (default is edit only)
- log - messages will be logged to Documents\{appname}-{port}.txt
+ log - messages will be logged to Documents\{.appname}-{port}.txt
  reset - overwrite samples scripts with the initial contents
  sandboxed - prevent full access to WWB-COM and WWB.NET
  scriptroot=dir - all scripts live in this directory tree

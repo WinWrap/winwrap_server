@@ -13,8 +13,20 @@ namespace winwrap_edit_server
     {
         static void Main(string[] args)
         {
-            Dictionary<string, object> parameters = GetParameters(args);
-            parameters["appname"] = "winwrap_edit_server";
+            Dictionary<string, object> defaults = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "help", false },
+                { "debug", false },
+                { "log", false },
+                { "ip", "localhost" },
+                { "port", 5000 },
+                { "reset", false },
+                { "sandboxed", false },
+                { "scriptroot", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WebEditServer" },
+                { "start", "http://www.winwrap.com/webedit/index.html" },
+                { "wwwroot", "" }
+            };
+            Dictionary<string, object> parameters = WWB.Util.GetParameters(args, defaults);
 
             bool help = (bool)parameters["help"];
             string error = VerifyWinWrapBasic();
@@ -109,81 +121,6 @@ namespace winwrap_edit_server
             }
 
             return null;
-        }
-
-        static private Dictionary<string, object> GetParameters(string[] args)
-        {
-            // get the options from the command line
-            Dictionary<string, object> default_parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase)
-            {
-                { "help", false },
-                { "debug", false },
-                { "log", false },
-                { "ip", "localhost" },
-                { "port", 5000 },
-                { "reset", false },
-                { "sandboxed", false },
-                { "scriptroot", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WebEditServer" },
-                { "start", "http://www.winwrap.com/webedit/index.html" },
-                { "wwwroot", "" }
-            };
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            foreach (string arg in args)
-            {
-                string[] parts = arg.Split(new char[] { '=' }, 2);
-                string key = parts[0];
-                if (!default_parameters.ContainsKey(key))
-                {
-                    Console.Write(Util.ReadResourceTextFile("Messages.BadOption", key));
-                    parameters["help"] = true;
-                    continue;
-                }
-
-                object value = default_parameters[key];
-                Type value_type = value.GetType();
-                if (parts.Length == 1)
-                {
-                    if (value_type != typeof(Boolean))
-                    {
-                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionNoValue", key));
-                        parameters["help"] = true;
-                        continue;
-                    }
-
-                    value = true;
-                }
-                else
-                {
-                    if (value_type == typeof(Boolean))
-                    {
-                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionValue", key));
-                        parameters["help"] = true;
-                        continue;
-                    }
-
-                    value = parts[1];
-                    try
-                    {
-                        value = Convert.ChangeType(parts[1], value_type);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Write(Util.ReadResourceTextFile("Messages.BadOptionValue2", key, ex.Message));
-                        parameters["help"] = true;
-                        continue;
-                    }
-                }
-
-                parameters[key] = value;
-            }
-
-            // establish values from defaults for missing parameters
-            foreach (string key in default_parameters.Keys)
-                if (!parameters.ContainsKey(key))
-                    parameters[key] = default_parameters[key];
-
-            return parameters;
         }
     }
 
