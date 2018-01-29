@@ -14,6 +14,7 @@ namespace WWB
     public class MyFileSystem : IVirtualFileSystem
     {
         private string root_;
+        private static object lock_ = new object();
 
         public MyFileSystem(string root)
         {
@@ -61,12 +62,18 @@ namespace WWB
         public void Delete(string scriptPath)
         {
             ValidatePath(scriptPath);
-            throw new NotImplementedException();
+            lock (lock_)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public bool Exists(string scriptPath)
         {
-            return File.Exists(ValidatePath(scriptPath));
+            lock (lock_)
+            {
+                return File.Exists(ValidatePath(scriptPath));
+            }
         }
 
         public string GetCaption(string scriptPath)
@@ -76,17 +83,38 @@ namespace WWB
 
         public DateTime GetTimeStamp(string scriptPath)
         {
-            return File.GetCreationTimeUtc(ValidatePath(scriptPath));
+            lock (lock_)
+            {
+                return File.GetCreationTimeUtc(ValidatePath(scriptPath));
+            }
         }
 
         public string Read(string scriptPath)
         {
-            return File.ReadAllText(ValidatePath(scriptPath));
+            lock (lock_)
+            {
+                string actualPath = ValidatePath(scriptPath);
+                if (!actualPath.EndsWith("\\"))
+                    return File.ReadAllText(actualPath);
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("%DIRECTORY%");
+                foreach (string dir in Directory.GetDirectories(actualPath))
+                    sb.AppendLine(Path.GetFileName(dir) + "\\");
+
+                foreach (string file in Directory.GetFiles(actualPath))
+                    sb.AppendLine(Path.GetFileName(file));
+
+                return sb.ToString();
+            }
         }
 
         public void Write(string scriptPath, string text)
         {
-            File.WriteAllText(ValidatePath(scriptPath), text);
+            lock (lock_)
+            {
+                File.WriteAllText(ValidatePath(scriptPath), text);
+            }
         }
 
         private string ValidatePath(string scriptPath)
