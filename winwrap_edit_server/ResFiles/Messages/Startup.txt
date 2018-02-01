@@ -1,7 +1,7 @@
 ﻿{.appname} help - for options
 
 Uses the new remote edit capability provided by WinWrap Basic v10.40.
-{flags}
+{.flags}
 ip={ip}
 port={port}
 scriptroot={scriptroot}

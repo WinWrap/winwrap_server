@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 
@@ -28,6 +29,7 @@ namespace winwrap_edit_server
                 }
             }
         }
+
         private WinWrapBasicService()
         {
         }
@@ -41,14 +43,17 @@ namespace winwrap_edit_server
             }
         }
 
-        public void Initialize(bool debug, bool sandboxed, string scriptroot, bool reset, string log_file)
+        public void Initialize(IDictionary<string, object> parameters, CancellationToken cancellationToken)
         {
-            log_file_ = log_file;
+            log_file_ = (string)parameters[".log_file"];
             if (log_file_ != null)
                 File.WriteAllText(log_file_, "");
 
+            string scriptroot = (string)parameters["scriptroot"];
             filesystem_ = new WWB.MyFileSystem(scriptroot);
             string root = filesystem_.Combine(null, null);
+
+            bool reset = (bool)parameters["reset"];
             if (!Directory.Exists(root))
             {
                 reset = true;
@@ -66,10 +71,13 @@ namespace winwrap_edit_server
                 }
             }
 
+            bool debug = (bool)parameters["debug"];
+            bool sandboxed = (bool)parameters["sandboxed"];
+            string secret = (string)parameters[".secret"];
             sharedWWB_ = new WWB.SharedWWB(basic =>
             {
                 // configure basic
-                basic.Secret = new Guid("00000000-0000-0000-0000-000000000000");
+                basic.Secret = new Guid(secret);
                 basic.Initialize();
                 basic.EditOnly = !debug;
                 basic.Sandboxed = sandboxed;

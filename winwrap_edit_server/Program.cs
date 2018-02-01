@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,8 @@ namespace winwrap_edit_server
             Dictionary<string, object> parameters = WWB.Util.GetParameters(args, defaults);
 
             bool help = (bool)parameters["help"];
-            string error = VerifyWinWrapBasic();
+            string secret = "00000000-0000-0000-0000-000000000000";
+            string error = VerifyWinWrapBasic(secret);
             if (error != null)
                 help = true;
 
@@ -40,23 +42,13 @@ namespace winwrap_edit_server
                 else
                     error = "\r\n" + error;
 
-                parameters["error"] = error;
+                parameters[".error"] = error;
 
                 Console.Write(Util.ReadResourceTextFile("Messages.Help", parameters));
                 Console.ReadKey();
                 return;
             }
 
-            string flags = "";
-            if ((bool)parameters["debug"]) flags += "\r\ndebug";
-            if ((bool)parameters["log"]) flags += "\r\nlog";
-            if ((bool)parameters["reset"]) flags += "\r\nreset";
-            if ((bool)parameters["sandboxed"]) flags += "\r\nsandboxed";
-            parameters["flags"] = flags;
-
-            Console.WriteLine(Util.ReadResourceTextFile("Messages.Startup", parameters));
-
-            bool debug = (bool)parameters["debug"];
             bool reset = (bool)parameters["reset"];
             bool sandboxed = (bool)parameters["sandboxed"];
             string scriptroot = (string)parameters["scriptroot"];
@@ -96,20 +88,39 @@ namespace winwrap_edit_server
                 System.Diagnostics.Process.Start(prefix + Util.Replace("{start}?serverip={ip}:{port}", parameters));
             }
 
-            WinWrapBasicService.Singleton.Initialize(debug, sandboxed, scriptroot, reset, log_file);
+            parameters[".log_file"] = log_file;
+            parameters[".secret"] = secret;
 
-            host.Run();
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                cts.Cancel();
+            };
 
-            WinWrapBasicService.Shutdown();
+            WinWrapBasicService.Singleton.Initialize(parameters, cts.Token);
+
+            try
+            {
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                WinWrapBasicService.Shutdown();
+            }
         }
 
-        static private string VerifyWinWrapBasic(Guid secret = default(Guid))
+        static private string VerifyWinWrapBasic(string secret)
         {
             try
             {
                 using (WinWrap.Basic.BasicNoUIObj basic = new WinWrap.Basic.BasicNoUIObj())
                 {
-                    basic.Secret = secret;
+                    basic.Secret = new Guid(secret);
                     basic.Initialize();
                     if (basic.IsInitialized())
                         return null;

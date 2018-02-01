@@ -81,13 +81,13 @@ namespace WWB
 
         public static string ReadResourceTextFile(string name, IDictionary<string, object> substitutions)
         {
-            return Replace(ReadResourceTextFile(name),substitutions);
+            return Replace(ReadResourceTextFile(name), substitutions);
         }
 
         public static string Replace(string text, IDictionary<string, object> substitutions)
         {
             foreach (KeyValuePair<string, object> kvp in substitutions)
-                text = text.Replace("{" + kvp.Key + "}", kvp.Value.ToString());
+                text = text.Replace("{" + kvp.Key + "}", kvp.Value?.ToString() ?? "");
 
             return text;
         }
@@ -152,6 +152,9 @@ namespace WWB
                         continue;
                     }
                 }
+
+                if (value_type == typeof(string))
+                    value = ((string)value).Replace("\"", "");
 
                 parameters[key] = value;
             }

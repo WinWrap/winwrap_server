@@ -17,5 +17,5 @@ options:
              use start= (no url) to prevent the web browser from opening a page
  wwwroot=dir - get web pages from this directory
                (default is {wwwroot})
-{error}
+{.error}
 Press any key to exit...
