@@ -63,9 +63,9 @@ namespace winwrap_edit_server
             if (reset)
             {
                 // copy samples to the virtual file system
-                foreach (string res_name in Util.GetResourceFileNames("Samples"))
+                foreach (string res_name in WWB.Util.GetResourceFileNames("Samples"))
                 {
-                    string sample = Util.ReadResourceTextFile("Samples." + res_name, false);
+                    string sample = WWB.Util.ReadResourceTextFile("Samples." + res_name, false);
                     string file_name = root + "\\" + res_name;
                     File.WriteAllText(file_name, sample);
                 }
@@ -73,11 +73,10 @@ namespace winwrap_edit_server
 
             bool debug = (bool)parameters["debug"];
             bool sandboxed = (bool)parameters["sandboxed"];
-            string secret = (string)parameters[".secret"];
             sharedWWB_ = new WWB.SharedWWB(basic =>
             {
                 // configure basic
-                basic.Secret = new Guid(secret);
+                basic.Secret = new Guid(Secret.MySecret);
                 basic.Initialize();
                 basic.EditOnly = !debug;
                 basic.Sandboxed = sandboxed;

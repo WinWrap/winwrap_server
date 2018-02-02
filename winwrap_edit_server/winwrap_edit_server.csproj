@@ -52,8 +52,8 @@
     <Compile Include="Formatters\WinWrapMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Secret.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Util.cs" />
     <Compile Include="WWB\MyFileSystem.cs" />
     <Compile Include="WWB\SharedWWB.cs" />
     <Compile Include="WWB\SynchronizingQueue.cs" />

@@ -30,8 +30,7 @@ namespace winwrap_edit_server
             Dictionary<string, object> parameters = WWB.Util.GetParameters(args, defaults);
 
             bool help = (bool)parameters["help"];
-            string secret = "00000000-0000-0000-0000-000000000000";
-            string error = VerifyWinWrapBasic(secret);
+            string error = VerifyWinWrapBasic();
             if (error != null)
                 help = true;
 
@@ -44,7 +43,7 @@ namespace winwrap_edit_server
 
                 parameters[".error"] = error;
 
-                Console.Write(Util.ReadResourceTextFile("Messages.Help", parameters));
+                Console.Write(WWB.Util.ReadResourceTextFile("Messages.Help", parameters));
                 Console.ReadKey();
                 return;
             }
@@ -58,7 +57,7 @@ namespace winwrap_edit_server
             if ((bool)parameters["log"])
                 log_file =
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                    Util.Replace("\\WebEditServer-{port}.txt", parameters);
+                    WWB.Util.Replace("\\WebEditServer-{port}.txt", parameters);
 
             var hostBuilder = new WebHostBuilder()
                 .UseKestrel();
@@ -76,20 +75,19 @@ namespace winwrap_edit_server
                     logging.SetMinimumLevel(LogLevel.Critical);
                 })
                 .UseStartup<Startup>()
-                .UseUrls(Util.Replace("http://{ip}:{port}", parameters))
+                .UseUrls(WWB.Util.Replace("http://{ip}:{port}", parameters))
                 .Build();
 
             if ((string)parameters["start"] != "")
             {
                 string prefix = null;
                 if (!((string)parameters["start"]).StartsWith("http:"))
-                    prefix = Util.Replace("http://{ip}:{port}/", parameters);
+                    prefix = WWB.Util.Replace("http://{ip}:{port}/", parameters);
 
-                System.Diagnostics.Process.Start(prefix + Util.Replace("{start}?serverip={ip}:{port}", parameters));
+                System.Diagnostics.Process.Start(prefix + WWB.Util.Replace("{start}?serverip={ip}:{port}", parameters));
             }
 
             parameters[".log_file"] = log_file;
-            parameters[".secret"] = secret;
 
             CancellationTokenSource cts = new CancellationTokenSource();
             Console.CancelKeyPress += (s, e) =>
@@ -114,13 +112,13 @@ namespace winwrap_edit_server
             }
         }
 
-        static private string VerifyWinWrapBasic(string secret)
+        static private string VerifyWinWrapBasic()
         {
             try
             {
                 using (WinWrap.Basic.BasicNoUIObj basic = new WinWrap.Basic.BasicNoUIObj())
                 {
-                    basic.Secret = new Guid(secret);
+                    basic.Secret = new Guid(Secret.MySecret);
                     basic.Initialize();
                     if (basic.IsInitialized())
                         return null;
