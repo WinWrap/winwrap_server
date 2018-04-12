@@ -31,8 +31,8 @@ namespace winwrap_edit_server.Controllers
                 { "id", 0 },
                 { "gen", 1 }
             };
-            string jsontext = JsonConvert.SerializeObject(request, Formatting.Indented);
-            string responses = WinWrapBasicService.Singleton.Synchronize(jsontext, 0);
+            string response = JsonConvert.SerializeObject(request, Formatting.Indented);
+            string responses = WinWrapBasicService.Singleton.SendRequestAndGetResponse(response, 0);
             return Ok(responses);
         }
 
@@ -46,8 +46,23 @@ namespace winwrap_edit_server.Controllers
         [HttpPost("poll/{id}")]
         public IActionResult Poll(int id, [FromBody]WinWrapMessage postdata)
         {
-            string jsontext = postdata.ToString();
-            string responses = WinWrapBasicService.Singleton.Synchronize(jsontext, id);
+            string request = postdata.ToString();
+            string responses = WinWrapBasicService.Singleton.SendRequestAndGetResponse(request, id);
+            return Ok(new WinWrapMessage(responses));
+        }
+
+        [HttpPost("request/{id}")]
+        public IActionResult Request_(int id, [FromBody]WinWrapMessage postdata)
+        {
+            string request = postdata.ToString();
+            WinWrapBasicService.Singleton.SendRequest(request, id);
+            return Ok(new WinWrapMessage("[]"));
+        }
+
+        [HttpPost("response/{id}")]
+        public IActionResult Response_(int id, [FromBody]WinWrapMessage postdata)
+        {
+            string responses = WinWrapBasicService.Singleton.GetResponse(id);
             return Ok(new WinWrapMessage(responses));
         }
     }

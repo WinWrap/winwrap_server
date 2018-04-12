@@ -101,12 +101,24 @@ namespace winwrap_edit_server
             }
         }
 
-        public string Synchronize(string param, int id)
+        public string GetResponse(int id)
         {
-            AppendToLogFile();
-            string response = sharedWWB_.SendRequestAndGetResponse(param, id);
+            string response = sharedWWB_.GetResponse(id);
             AppendToLogFile();
             return response;
+        }
+
+        public void SendRequest(string param, int id)
+        {
+            sharedWWB_.SendRequest(param, id);
+            AppendToLogFile();
+        }
+
+        public string SendRequestAndGetResponse(string param, int id)
+        {
+            SendRequest(param, id);
+            Thread.Sleep(50);
+            return GetResponse(id);
         }
 
         private void AppendToLogFile()

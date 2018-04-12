@@ -39,7 +39,7 @@ namespace WWB
                     basic_.DoEvents += Basic__DoEvents;
                     basic_.Synchronizing += Basic__Synchronizing;
                     // configure basic
-                    bool edit = configure.Invoke(basic_);
+                    bool edit = configure?.Invoke(basic_) ?? false;
                     // start synchronizing
                     if (edit)
                         basic_.SynchronizedEdit = true;
@@ -119,7 +119,7 @@ namespace WWB
         }
 
         // called from main thread
-        public string SendRequestAndGetResponse(string param, int id)
+        public void SendRequest(string param, int id)
         {
             if (param == null)
                 param = "[]";
@@ -133,18 +133,25 @@ namespace WWB
 
                 // send request
                 basic_.Synchronize(param, id);
-
-                // prepare synchronize done event
-                basic_synchronize_done_.Reset();
-
-                // ?attach timeout is 0.5 seconds
-                int timeout = attach ? 500 : 50;
-
-                // wait for thread to process
-                basic_synchronize_done_.WaitOne(timeout);
             }
+        }
 
+        // called from main thread
+        public string GetResponse(int id, int maxwait = 0)
+        {
             // return responses for the id
+            for (int i = 0; i < maxwait/50; ++i)
+            {
+                // wait for up to 5 seconds
+                lock (lock_)
+                {
+                    if (response_sqs_.Count > 0)
+                        break;
+
+                    Thread.Sleep(50);
+                }
+            }
+                
             lock (lock_)
                 return response_sqs_.Dequeue(id);
         }
