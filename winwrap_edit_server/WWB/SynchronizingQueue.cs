@@ -116,7 +116,7 @@ namespace WWB
             // kill any synchronizing queues that haven't been used in over one minute
             List<int> kill_ids = new List<int>();
             foreach (SynchronizingQueue sq2 in Values)
-                if (!sq2.Alive)
+                if (!sq2.Alive && sq2.Id != 0)
                     kill_ids.Add(sq2.Id);
 
             foreach (int kill_id in kill_ids)
