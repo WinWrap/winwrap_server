@@ -80,7 +80,7 @@ namespace winwrap_edit_server
                 basic.Initialize();
                 basic.EditOnly = !debug;
                 basic.Sandboxed = sandboxed;
-                basic.BlockedKeywords = "AboutWinWrapBasic Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
+                basic.BlockedKeywords = "AboutWinWrapBasic Beep Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                 basic.VirtualFileSystem = filesystem_;
                 return true; // synchronized editing
             }, log_file_ != null);
@@ -101,24 +101,17 @@ namespace winwrap_edit_server
             }
         }
 
-        public string GetResponse(int id)
+        public string GetResponses(SortedSet<int> idset)
         {
-            string response = sharedWWB_.GetResponse(id);
+            string response = sharedWWB_.GetResponses(idset);
             AppendToLogFile();
             return response;
         }
 
-        public void SendRequest(string param, int id)
+        public void SendRequests(string param)
         {
-            sharedWWB_.SendRequest(param, id);
+            sharedWWB_.SendRequests(param);
             AppendToLogFile();
-        }
-
-        public string SendRequestAndGetResponse(string param, int id)
-        {
-            SendRequest(param, id);
-            Thread.Sleep(50);
-            return GetResponse(id);
         }
 
         private void AppendToLogFile()

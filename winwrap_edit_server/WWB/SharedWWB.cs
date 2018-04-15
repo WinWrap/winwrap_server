@@ -21,9 +21,8 @@ namespace WWB
         bool kill_; // kill the thread
         bool killed_;
         EventWaitHandle dead_ = new EventWaitHandle(false, EventResetMode.ManualReset);
-        EventWaitHandle basic_synchronize_done_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         static object lock_ = new object();
-        SynchronizingQueues response_sqs_ = new SynchronizingQueues();
+        SynchronizingQueues responses_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
 
         public SharedWWB(Func<BasicNoUIObj, bool> configure, bool logging = false)
@@ -56,7 +55,6 @@ namespace WWB
 
                 killed_ = true;
                 dead_.Set();
-                basic_synchronize_done_.Dispose();
             });
 
             thread_.Start();
@@ -108,23 +106,19 @@ namespace WWB
 
         private void ProcessRequestQueue()
         {
-            // get everything from the synchronize queue
+            // process everything from the synchronize queue
             basic_.Synchronize(null, 0);
 
             // do pending windows events
             WinWrap.Basic.Util.DoEvents();
-
-            // all synchronize data has been sent
-            basic_synchronize_done_.Set();
         }
 
         // called from main thread
-        public void SendRequest(string param, int id)
+        public void SendRequests(string param)
         {
             if (param == null)
                 param = "[]";
 
-            bool attach = id == 0 && param != "[]";
             if (!killed_)
             {
                 if (param != "[]")
@@ -132,28 +126,26 @@ namespace WWB
                         log_sq_?.Enqueue(param);
 
                 // send request
-                basic_.Synchronize(param, id);
+                basic_.Synchronize(param, 0);
             }
         }
 
         // called from main thread
-        public string GetResponse(int id, int maxwait = 0)
+        public string GetResponses(SortedSet<int> idset)
         {
-            // return responses for the id
-            for (int i = 0; i < maxwait/50; ++i)
+            SynchronizingQueue sq = new SynchronizingQueue(0);
+            foreach (int id in idset)
             {
-                // wait for up to 5 seconds
+                // refresh detach timer
+                basic_.Synchronize("[]", id);
+                string responses = null;
                 lock (lock_)
-                {
-                    if (response_sqs_.Count > 0)
-                        break;
+                    responses = responses_sqs_.Dequeue(id);
 
-                    Thread.Sleep(50);
-                }
+                sq.Enqueue(responses);
             }
                 
-            lock (lock_)
-                return response_sqs_.Dequeue(id);
+            return sq.DequeueAll();
         }
 
         private void Basic__Synchronizing(object sender, SynchronizingEventArgs e)
@@ -164,7 +156,7 @@ namespace WWB
                 if (e.Param != "[]")
                     log_sq_?.Enqueue(e.Param);
 
-                response_sqs_.Enqueue(e.Param, e.Id);
+                responses_sqs_.Enqueue(e.Param, e.Id);
             }
         }
 

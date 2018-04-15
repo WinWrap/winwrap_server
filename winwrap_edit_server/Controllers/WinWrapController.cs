@@ -20,22 +20,6 @@ namespace winwrap_edit_server.Controllers
             return Ok("Hello World from the WinWrap controller");
         }
 
-        [Route("version")]
-        public IActionResult Version()
-        {
-            Dictionary<string, object> request = new Dictionary<string, object>()
-            {
-                { "command", "?attach" },
-                { "version", "10.40.001" },
-                { "unique_name", -1 },
-                { "id", 0 },
-                { "gen", 1 }
-            };
-            string response = JsonConvert.SerializeObject(request, Formatting.Indented);
-            string responses = WinWrapBasicService.Singleton.SendRequestAndGetResponse(response, 0);
-            return Ok(responses);
-        }
-
         [Route("pulllog")]
         public IActionResult PullLog()
         {
@@ -43,26 +27,22 @@ namespace winwrap_edit_server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("poll/{id}")]
-        public IActionResult Poll(int id, [FromBody]WinWrapMessage postdata)
+        [HttpPost("requests")]
+        public IActionResult Requests([FromBody]WinWrapMessage postdata)
         {
             string request = postdata.ToString();
-            string responses = WinWrapBasicService.Singleton.SendRequestAndGetResponse(request, id);
-            return Ok(new WinWrapMessage(responses));
-        }
-
-        [HttpPost("request/{id}")]
-        public IActionResult Request_(int id, [FromBody]WinWrapMessage postdata)
-        {
-            string request = postdata.ToString();
-            WinWrapBasicService.Singleton.SendRequest(request, id);
+            WinWrapBasicService.Singleton.SendRequests(request);
             return Ok(new WinWrapMessage("[]"));
         }
 
-        [HttpPost("response/{id}")]
-        public IActionResult Response_(int id, [FromBody]WinWrapMessage postdata)
+        [HttpPost("responses/{ids}")]
+        public IActionResult Responses(string ids, [FromBody]WinWrapMessage postdata)
         {
-            string responses = WinWrapBasicService.Singleton.GetResponse(id);
+            SortedSet<int> idset = new SortedSet<int>();
+            foreach (string idx in ids.Split('-'))
+                if (int.TryParse(idx, out int id))
+                    idset.Add(id);
+            string responses = WinWrapBasicService.Singleton.GetResponses(idset);
             return Ok(new WinWrapMessage(responses));
         }
     }
