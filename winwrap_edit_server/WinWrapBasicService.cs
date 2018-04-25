@@ -83,7 +83,7 @@ namespace winwrap_edit_server
                 basic.BlockedKeywords = "AboutWinWrapBasic Beep Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                 basic.VirtualFileSystem = filesystem_;
                 return true; // synchronized editing
-            }, log_file_ != null);
+            }, null, log_file_ != null);
         }
 
         public string LogFile

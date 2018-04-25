@@ -24,9 +24,11 @@ namespace WWB
         static object lock_ = new object();
         SynchronizingQueues responses_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
+        Action<BasicNoUIObj> doevents_;
 
-        public SharedWWB(Func<BasicNoUIObj, bool> configure, bool logging = false)
+        public SharedWWB(Func<BasicNoUIObj, bool> configure, Action<BasicNoUIObj> doevents = null, bool logging = false)
         {
+            doevents_ = doevents;
             Logging = logging;
 
             EventWaitHandle ready = new EventWaitHandle(false, EventResetMode.AutoReset);
@@ -111,6 +113,9 @@ namespace WWB
 
             // do pending windows events
             WinWrap.Basic.Util.DoEvents();
+
+            // application events
+            doevents_?.Invoke(basic_);
         }
 
         // called from main thread
@@ -131,19 +136,23 @@ namespace WWB
         }
 
         // called from main thread
+        public string GetResponses(int id)
+        {
+            // refresh detach timer
+            basic_.Synchronize("[]", id);
+            string responses = null;
+            lock (lock_)
+                responses = responses_sqs_.Dequeue(id);
+
+            return responses;
+        }
+
+        // called from main thread
         public string GetResponses(SortedSet<int> idset)
         {
             SynchronizingQueue sq = new SynchronizingQueue(0);
             foreach (int id in idset)
-            {
-                // refresh detach timer
-                basic_.Synchronize("[]", id);
-                string responses = null;
-                lock (lock_)
-                    responses = responses_sqs_.Dequeue(id);
-
-                sq.Enqueue(responses);
-            }
+                sq.Enqueue(GetResponses(id));
                 
             return sq.DequeueAll();
         }
