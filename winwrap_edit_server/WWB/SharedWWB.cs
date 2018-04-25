@@ -140,11 +140,8 @@ namespace WWB
         {
             // refresh detach timer
             basic_.Synchronize("[]", id);
-            string responses = null;
             lock (lock_)
-                responses = responses_sqs_.Dequeue(id);
-
-            return responses;
+                return responses_sqs_.Dequeue(id);
         }
 
         // called from main thread
