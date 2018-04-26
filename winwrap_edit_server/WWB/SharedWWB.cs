@@ -19,8 +19,6 @@ namespace WWB
         Thread thread_; // thread for shared WinWrap Basic
         BasicNoUIObj basic_; // shared WinWrap Basic
         bool kill_; // kill the thread
-        bool killed_;
-        EventWaitHandle dead_ = new EventWaitHandle(false, EventResetMode.ManualReset);
         static object lock_ = new object();
         SynchronizingQueues responses_sqs_ = new SynchronizingQueues();
         SynchronizingQueue log_sq_;
@@ -54,9 +52,6 @@ namespace WWB
                         ProcessRequestQueue();
                     }
                 }
-
-                killed_ = true;
-                dead_.Set();
             });
 
             thread_.Start();
@@ -66,20 +61,21 @@ namespace WWB
 
         public void Dispose()
         {
-            if (dead_ != null && Kill())
-            {
-                dead_.Dispose();
-                dead_ = null;
-            }
+            Kill();
         }
 
         public bool Kill()
         {
-            kill_ = true;
-            if (!killed_)
-                dead_.WaitOne(1000);
+            if (thread_ != null)
+            {
+                kill_ = true;
+                if (!thread_.Join(1000))
+                    return false;
 
-            return killed_;
+                thread_ = null;
+            }
+
+            return true;
         }
 
         public bool Logging
@@ -121,12 +117,9 @@ namespace WWB
         // called from main thread
         public void SendRequests(string param)
         {
-            if (param == null)
-                param = "[]";
-
-            if (!killed_)
+            if (thread_ != null)
             {
-                if (param != "[]")
+                if (param != null && param != "[]")
                     lock (lock_)
                         log_sq_?.Enqueue(param);
 
