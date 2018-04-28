@@ -73,7 +73,8 @@ namespace winwrap_edit_server
 
             bool debug = (bool)parameters["debug"];
             bool sandboxed = (bool)parameters["sandboxed"];
-            sharedWWB_ = new WWB.SharedWWB(basic =>
+            sharedWWB_ = new WWB.SharedWWB(log_file_ != null);
+            sharedWWB_.SendAction(basic =>
             {
                 // configure basic
                 basic.Secret = new Guid(Secret.MySecret);
@@ -82,8 +83,8 @@ namespace winwrap_edit_server
                 basic.Sandboxed = sandboxed;
                 basic.BlockedKeywords = "AboutWinWrapBasic Beep Dialog GetFilePath InputBox MsgBox ShowPopupMenu";
                 basic.VirtualFileSystem = filesystem_;
-                return true; // synchronized editing
-            }, null, log_file_ != null);
+                basic.SynchronizedEdit = true; // synchronized editing
+            });
         }
 
         public string LogFile
