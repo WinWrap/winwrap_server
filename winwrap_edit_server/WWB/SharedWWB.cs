@@ -174,7 +174,7 @@ namespace WWB
                 basic_.Run = false;
         }
 
-        public void PostAction(Action<BasicNoUIObj> action, Action<Exception> completed)
+        public void PostAction(Action<BasicNoUIObj> action, Action<Exception> completed = null)
         {
             SynchronizationContext sc = SynchronizationContext.Current;
             Post(state =>
@@ -190,8 +190,9 @@ namespace WWB
                     ex = e;
                 }
 
-                // execute completed handler in caller's synchronization context
-                sc.Post(state2 => completed(ex), null);
+                if (completed != null)
+                    // execute completed handler in caller's synchronization context
+                    sc.Post(state2 => completed(ex), null);
             }, null);
         }
 
