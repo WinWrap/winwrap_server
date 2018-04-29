@@ -20,13 +20,6 @@ namespace winwrap_edit_server.Controllers
             return Ok("Hello World from the WinWrap controller");
         }
 
-        [Route("pulllog")]
-        public IActionResult PullLog()
-        {
-            string result = WinWrapBasicService.Singleton.PullLog();
-            return Ok(result);
-        }
-
         [HttpPost("requests")]
         public IActionResult Requests([FromBody]WinWrapMessage postdata)
         {
@@ -42,6 +35,7 @@ namespace winwrap_edit_server.Controllers
             foreach (string idx in ids.Split('-'))
                 if (int.TryParse(idx, out int id))
                     idset.Add(id);
+
             string responses = WinWrapBasicService.Singleton.GetResponses(idset);
             return Ok(new WinWrapMessage(responses));
         }

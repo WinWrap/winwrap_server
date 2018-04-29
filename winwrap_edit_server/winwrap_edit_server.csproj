@@ -55,7 +55,6 @@
     <Compile Include="Secret.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="WWB\MyFileSystem.cs" />
-    <Compile Include="WWB\SharedWWB.cs" />
     <Compile Include="WWB\SynchronizingQueue.cs" />
     <Compile Include="WinWrapBasicService.cs" />
     <Compile Include="WWB\Util.cs" />

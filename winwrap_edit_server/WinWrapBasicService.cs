@@ -6,15 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 
+using WinWrap.Basic;
+
 namespace winwrap_edit_server
 {
     public class WinWrapBasicService
     {
-        private WWB.SharedWWB sharedWWB_;
-        private WinWrap.Basic.IVirtualFileSystem filesystem_;
-        private string log_file_;
-        static private object lock_ = new object();
-        static private WinWrapBasicService singleton_;
+        BasicThread basic_thread_;
+        WinWrap.Basic.IVirtualFileSystem filesystem_;
+        string log_file_;
+        static object lock_ = new object();
+        static WinWrapBasicService singleton_;
+        WWB.SynchronizingQueues responses_sqs_ = new WWB.SynchronizingQueues();
 
         public static WinWrapBasicService Singleton
         {
@@ -38,7 +41,7 @@ namespace winwrap_edit_server
         {
             if (singleton_ != null)
             {
-                singleton_.sharedWWB_.Kill();
+                singleton_.basic_thread_.Kill();
                 singleton_ = null;
             }
         }
@@ -73,10 +76,21 @@ namespace winwrap_edit_server
 
             bool debug = (bool)parameters["debug"];
             bool sandboxed = (bool)parameters["sandboxed"];
-            sharedWWB_ = new WWB.SharedWWB(log_file_ != null);
-            sharedWWB_.SendAction(basic =>
+            basic_thread_ = new BasicThread();
+            SynchronizationContext sc = new SynchronizationContext();
+            basic_thread_.SendAction(basic =>
             {
                 // configure basic
+                basic.Synchronizing += (sender, e) =>
+                {
+                    // response/notification from the remote BasicNoUIObj
+                    sc.Post(state => {
+                        Log(e.Param);
+                        lock (lock_)
+                            responses_sqs_.Enqueue(e.Param, e.Id);
+                    }, null);
+                };
+                Util.IgnoreDialogs = true;
                 basic.Secret = new Guid(Secret.MySecret);
                 basic.Initialize();
                 basic.EditOnly = !debug;
@@ -96,7 +110,6 @@ namespace winwrap_edit_server
             set
             {
                 log_file_ = value;
-                sharedWWB_.Logging = log_file_ != null;
                 if (log_file_ != null)
                     File.WriteAllText(log_file_, "");
             }
@@ -104,30 +117,37 @@ namespace winwrap_edit_server
 
         public string GetResponses(SortedSet<int> idset)
         {
-            string response = sharedWWB_.GetResponses(idset);
-            AppendToLogFile();
-            return response;
-        }
-
-        public void SendRequests(string param)
-        {
-            sharedWWB_.SendRequests(param);
-            AppendToLogFile();
-        }
-
-        private void AppendToLogFile()
-        {
+            WWB.SynchronizingQueue sq = new WWB.SynchronizingQueue(0);
             lock (lock_)
-            {
-                string log = sharedWWB_.PullLog();
-                if (log != null && log_file_ != null)
-                    File.AppendAllText(log_file_, log + "\r\n\r\n");
-            }
+                foreach (int id in idset)
+                    sq.Enqueue(responses_sqs_.Dequeue(id));
+
+            return sq.DequeueAll();
         }
 
-        public string PullLog()
+        public void SendRequests(string requests)
         {
-            return sharedWWB_.PullLog();
+            Log(requests);
+            basic_thread_.PostAction(basic => basic.Synchronize(requests, 0));
+        }
+
+        private void Log(string text)
+        {
+            if (log_file_ != null && text != "[]")
+            {
+                if (text.StartsWith("[") && text.EndsWith("]"))
+                    text = text.Substring(1, text.Length - 2);
+
+                text = text.Replace("\r\n{", "_{");
+                text = text.Replace("\r\n", "") + "\r\n";
+                text = text.Replace("_{", "\r\n{");
+                text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss\r\n") + text;
+                lock (lock_)
+                    File.AppendAllText(log_file_, text + "\r\n");
+
+                if (text.IndexOf("\"response\":\"!attach\"") >= 0 || text.IndexOf("\"response\":\"!detached\"") >= 0)
+                    Console.WriteLine(text);
+            }
         }
     }
 }
