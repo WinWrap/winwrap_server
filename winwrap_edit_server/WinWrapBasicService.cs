@@ -90,6 +90,10 @@ namespace winwrap_edit_server
                             responses_sqs_.Enqueue(e.Param, e.Id);
                     }, null);
                 };
+                basic.ReceivedAppSyncMessage += (sender, e) =>
+                {
+                    basic.SendAppSyncMessage(e.Data, -1);
+                };
                 Util.IgnoreDialogs = true;
                 basic.Secret = new Guid(Secret.MySecret);
                 basic.Initialize();
