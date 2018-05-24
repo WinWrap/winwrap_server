@@ -121,6 +121,13 @@ namespace winwrap_edit_server
 
         public string GetResponses(SortedSet<int> idset)
         {
+            // keep ids alive
+            basic_thread_.PostAction(basic =>
+            {
+                foreach (int id in idset)
+                    basic.Synchronize("[]", id);
+            });
+
             WWB.SynchronizingQueue sq = new WWB.SynchronizingQueue(0);
             lock (lock_)
                 foreach (int id in idset)
