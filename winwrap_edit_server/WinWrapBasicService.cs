@@ -12,7 +12,7 @@ namespace winwrap_edit_server
 {
     public class WinWrapBasicService
     {
-        BasicThread basic_thread_;
+        BasicThread basic_thread_ = new BasicThread();
         WinWrap.Basic.IVirtualFileSystem filesystem_;
         string log_file_;
         static object lock_ = new object();
@@ -76,7 +76,6 @@ namespace winwrap_edit_server
 
             bool debug = (bool)parameters["debug"];
             bool sandboxed = (bool)parameters["sandboxed"];
-            basic_thread_ = new BasicThread();
             SynchronizationContext sc = new SynchronizationContext();
             basic_thread_.SendAction(basic =>
             {
@@ -122,7 +121,7 @@ namespace winwrap_edit_server
         public string GetResponses(SortedSet<int> idset)
         {
             // keep ids alive
-            basic_thread_.PostAction(basic =>
+            basic_thread_?.PostAction(basic =>
             {
                 foreach (int id in idset)
                     basic.Synchronize("[]", id);
@@ -139,7 +138,7 @@ namespace winwrap_edit_server
         public void SendRequests(string requests)
         {
             Log(requests);
-            basic_thread_.PostAction(basic => basic.Synchronize(requests, 0));
+            basic_thread_?.PostAction(basic => basic.Synchronize(requests, 0));
         }
 
         private void Log(string text)
