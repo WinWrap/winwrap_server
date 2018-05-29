@@ -95,5 +95,11 @@
   <ItemGroup>
     <EmbeddedResource Include="ResFiles\Samples\Sample1.bas" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\..\..\Program Files %28x86%29\Polar Engineering\WinWrap Basic v10 - For .NET 4.0\REDIST\ww10_32w.dll">
+      <Link>ww10_32w.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
