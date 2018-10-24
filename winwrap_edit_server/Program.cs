@@ -24,7 +24,7 @@ namespace winwrap_edit_server
                 { "reset", false },
                 { "sandboxed", false },
                 { "scriptroot", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\WebEditServer" },
-                { "start", "http://www.winwrap.com/webedit/index.html" },
+                { "start", "http://www.winwrap.com/webedit/" },
                 { "wwwroot", "" }
             };
             Dictionary<string, object> parameters = WWB.Util.GetParameters(args, defaults);
