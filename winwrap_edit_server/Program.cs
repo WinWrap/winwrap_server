@@ -14,6 +14,8 @@ namespace winwrap_edit_server
     {
         static void Main(string[] args)
         {
+            // to debug locally use these command line arguments:
+            // debug start=http://localhost:5000/debug.htm wwwroot=e:\git\winwrap_client
             Dictionary<string, object> defaults = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "help", false },

@@ -8,9 +8,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>winwrap_edit_server</RootNamespace>
     <AssemblyName>winwrap_edit_server</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -40,9 +41,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="ww10_net, Version=10.40.0.61, Culture=neutral, PublicKeyToken=d08a0738ecd16506, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\dev\ww10.40\wwbnet\4.0\signed\ww10_net.dll</HintPath>
+    <Reference Include="ww10_net">
+      <HintPath>..\..\..\dev\ww10.52\wwbnet\4.0\Support\redist\ww10_net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -80,12 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ResFiles\Samples\Sample1.bas" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\..\..\..\..\Program Files %28x86%29\Polar Engineering\WinWrap Basic v10 - For .NET 4.0\REDIST\ww10_32w.dll">
-      <Link>ww10_32w.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore">
