@@ -42,7 +42,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="ww10_net">
-      <HintPath>..\..\..\dev\ww10.52\wwbnet\4.0\Support\redist\ww10_net.dll</HintPath>
+      <HintPath>..\..\..\dev\ww10.53\wwbnet\4.0\Support\redist\ww10_net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
